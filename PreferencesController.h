@@ -14,9 +14,11 @@
     IBOutlet NSView*                    _generalView;
     IBOutlet NSTextView*                _aboutContent;
     IBOutlet NSArrayController*         _autoCorrectController;
+    IBOutlet NSSegmentedControl*        _tabControl;
 
     NSInteger                           _currentViewTag;
     NSMutableArray*                     _autoCorrectItemsArray;
+    NSVisualEffectView*                 _backgroundEffectView;
 }
 
 @property (assign) NSMutableArray* autoCorrectItemsArray;

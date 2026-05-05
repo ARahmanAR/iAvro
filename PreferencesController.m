@@ -8,6 +8,7 @@
 #import "PreferencesController.h"
 #import "AutoCorrect.h"
 #import "AutoCorrectItem.h"
+#import "ModernUIHelper.h"
 
 @implementation PreferencesController
 
@@ -32,18 +33,41 @@
 
 - (void)dealloc
 {
+    [_backgroundEffectView release];
     [_autoCorrectItemsArray release];
     [super dealloc];
 }
 
 - (void)awakeFromNib {
-	[[self window] setContentSize:[_generalView frame].size];
-    [[[self window] contentView] addSubview:_generalView];
-    [[[self window] contentView] setWantsLayer:YES];
+    NSWindow *window = [self window];
+    
+    // Apply modern glass design
+    [ModernUIHelper applyModernWindowStyle:window withTitle:@"Avro Keyboard Preferences"];
+    
+    // Setup window properties
+    [window setShowsResizeIndicator:YES];
+    [window setMinSize:NSMakeSize(500, 400)];
+    
+    // Configure content view with layer
+    NSView *contentView = [window contentView];
+    [contentView setWantsLayer:YES];
+    
+    // Setup initial view
+    [[self window] setContentSize:[_generalView frame].size];
+    [contentView addSubview:_generalView];
+    
+    // Style the tab control
+    if (_tabControl) {
+        [ModernUIHelper styleSegmentedControl:_tabControl];
+    }
     
     // Load Credits
     [_aboutContent readRTFDFromFile:[[NSBundle mainBundle] pathForResource:@"Credits" ofType:@"rtfd"]];
     [_aboutContent scrollToBeginningOfDocument:_aboutContent];
+    
+    // Style the about content view
+    [_aboutContent setTextColor:[ModernUIHelper textColor]];
+    [_aboutContent setBackgroundColor:[ModernUIHelper tertiaryBackgroundColor]];
 }
 
 - (NSRect)newFrameForNewContentView:(NSView*)view {
@@ -94,7 +118,12 @@
     
     if ([[NSApp currentEvent] modifierFlags] & NSEventModifierFlagShift) {
         [[NSAnimationContext currentContext] setDuration:1.0];
+    } else {
+        [[NSAnimationContext currentContext] setDuration:0.3];
     }
+    
+    [[NSAnimationContext currentContext] setTimingFunction:
+     [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
     
     [[[[self window] contentView] animator] replaceSubview:previousView with:view];
     [[[self window] animator] setFrame:newFrame display:YES];
